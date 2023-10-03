@@ -43,19 +43,19 @@ export class GridGraph {
     const neighbors = []
     const [x, y] = this.indexToCoords(index)
 
-    if (y > 0) neighbors.push(this.coordsToIndex(x, y - 1)) // Top
-    if (x > 0) neighbors.push(this.coordsToIndex(x - 1, y)) // Left
-    if (x < this.w - 1) neighbors.push(this.coordsToIndex(x + 1, y)) // Right
-    if (y < this.h - 1) neighbors.push(this.coordsToIndex(x, y + 1)) // Bottom
+    if (y > 0) neighbors.push(this.coordsToIndex([x, y - 1])) // Top
+    if (x > 0) neighbors.push(this.coordsToIndex([x - 1, y])) // Left
+    if (x < this.w - 1) neighbors.push(this.coordsToIndex([x + 1, y])) // Right
+    if (y < this.h - 1) neighbors.push(this.coordsToIndex([x, y + 1])) // Bottom
 
     return neighbors
   }
 
-  indexToCoords(index: number) {
+  indexToCoords(index: number): Coords {
     return [index % this.w, Math.floor(index / this.w)]
   }
 
-  coordsToIndex(x: number, y: number) {
+  coordsToIndex([x, y]: Coords) {
     return y * this.w + x
   }
 
@@ -65,6 +65,10 @@ export class GridGraph {
 
   getVertex(index?: number) {
     return index ? this.graph[index] : undefined
+  }
+
+  coordsToVertex(vx: Coords) {
+    return this.getVertex(this.coordsToIndex(vx))
   }
 
   setValueByIndex(index: number, value: VertexVal) {
@@ -92,7 +96,7 @@ export class GridGraph {
 }
 
 export function checkCellAhead(nextPos: Coords, graph: GridGraph) {
-  const index = graph.coordsToIndex(...nextPos)
+  const index = graph.coordsToIndex(nextPos)
   const vertex = graph.getVertex(index)
 
   return vertex

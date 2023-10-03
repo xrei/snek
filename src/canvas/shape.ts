@@ -2,6 +2,7 @@ import {CELL_SIZE, EDGE_GAP} from '@app/shared'
 import {cellPosToPixelPos} from './utils'
 import {Snake} from '@app/logic/snake/Snake'
 import {GridGraph} from '@app/shared/graph'
+import {GameModel} from '@app/logic/game'
 
 type GenericDrawParams = {
   ctx: CanvasRenderingContext2D
@@ -32,14 +33,17 @@ export function drawText({
   graph,
 }: GenericDrawParams) {
   const [x, y] = cellPosToPixelPos(pos)
-  const idx = graph?.coordsToIndex(...pos).toString() ?? ''
-  console.log(graph, idx)
+  const idx = graph?.coordsToIndex(pos).toString() ?? ''
 
-  ctx.font = `${Math.floor(CELL_SIZE * 0.5)}px Arial`
+  ctx.font = `${Math.floor(CELL_SIZE * 0.45)}px Arial`
   ctx.fillStyle = color
   ctx.textAlign = 'center'
 
-  ctx.fillText(idx, EDGE_GAP + x + CELL_SIZE / 2, EDGE_GAP + y + CELL_SIZE / 2)
+  ctx.fillText(
+    idx,
+    1 + EDGE_GAP + x + CELL_SIZE / 2,
+    2 + EDGE_GAP + y + CELL_SIZE / 2
+  )
 }
 
 export function drawFood({ctx, food}: DrawFoodParams) {
@@ -49,6 +53,8 @@ export function drawFood({ctx, food}: DrawFoodParams) {
 }
 
 export function drawSnake({ctx, snake, graph}: DrawSnakeParams) {
+  const isDebug = GameModel.$isDebug.getState()
+
   for (const segment of snake.body) {
     const isDead = snake.isDead
     const isHead = snake.head === segment
@@ -61,12 +67,12 @@ export function drawSnake({ctx, snake, graph}: DrawSnakeParams) {
       color: isDead ? deadColor : color,
     })
 
-    // if (graph) {
-    //   drawText({
-    //     ctx,
-    //     pos: segment,
-    //     graph,
-    //   })
-    // }
+    if (isDebug) {
+      drawText({
+        ctx,
+        pos: segment,
+        graph,
+      })
+    }
   }
 }

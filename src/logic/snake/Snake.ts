@@ -1,3 +1,4 @@
+import {Strategies} from '@app/pathfinding/types'
 import {DIRECTIONS} from '@app/shared'
 
 const snakeColors = [
@@ -17,6 +18,7 @@ type SnakeConstructor = {
   id: string
   initialPos: Coords
   isAi: boolean
+  aiStrategy?: Strategies
 }
 
 export class Snake {
@@ -30,8 +32,9 @@ export class Snake {
     head: string
     tail: string
   }
+  aiStrategy?: Strategies
 
-  constructor({id, initialPos, isAi}: SnakeConstructor) {
+  constructor({id, initialPos, isAi, aiStrategy}: SnakeConstructor) {
     this.id = id
     this.body = [initialPos, [initialPos[0] + 1, initialPos[1]]]
     this.isAi = isAi
@@ -39,6 +42,9 @@ export class Snake {
     this.isDead = false
     this.direction = DIRECTIONS.LEFT
     this.color = pickColor()
+    if (this.isAi) {
+      this.aiStrategy = aiStrategy
+    }
   }
 
   get head() {
@@ -76,6 +82,7 @@ export class Snake {
       id: this.id,
       initialPos: this.head,
       isAi: this.isAi,
+      aiStrategy: this.aiStrategy,
     })
     cloned.body = [...this.body]
     cloned.score = this.score

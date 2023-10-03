@@ -6,6 +6,7 @@ import {Logic, State} from './logic'
 import {drawFood, drawSnake} from './canvas'
 import {InputManager, getNextPositionByDirection, warpPosition} from './shared'
 import {checkCellAhead} from './shared/graph'
+import {createPathfinder, findClosesObject} from './pathfinding'
 
 const inputManager = new InputManager()
 
@@ -32,30 +33,57 @@ const main = () => {
       drawSnake({ctx, snake, graph})
     }
     drawGrid(ctx, grid)
-    console.log('[RENDER end]')
+    // console.log('[RENDER end]')
   }
   const updateFn = ({state}: WithState) => {
     const {snakes, foods} = state
     const graph = state.graph.clone()
     const inputDirection = inputManager.getDirection()
-    const updatedSnakes = []
-    let updatedFoods = [...foods]
+    const nextState: {snakes: typeof state.snakes; foods: typeof state.foods} =
+      {
+        snakes: [],
+        foods: [...foods],
+      }
 
     for (const snake of snakes) {
       if (snake.isDead) {
-        updatedSnakes.push(snake)
+        nextState.snakes.push(snake)
         continue
       }
       const updatedSnake = snake.clone()
 
-      if (Number.isInteger(inputDirection)) {
-        updatedSnake.setDirection(inputDirection)
+      let nextPosition: Coords | undefined
+
+      if (updatedSnake.isAi && updatedSnake.aiStrategy) {
+        const pathfinder = createPathfinder(updatedSnake.aiStrategy)
+        const res = pathfinder({
+          goal:
+            graph.coordsToVertex(
+              findClosesObject(
+                updatedSnake.head,
+                nextState.foods.map((v) => v[0])
+              )
+            ) ?? null,
+          graph,
+          start: updatedSnake.head,
+        })
+
+        nextPosition = res ? res.nextMove : undefined
+      } else {
+        if (Number.isInteger(inputDirection)) {
+          updatedSnake.setDirection(inputDirection)
+        }
+        nextPosition = warpPosition(
+          getNextPositionByDirection(updatedSnake.head, updatedSnake.direction),
+          graph
+        )
       }
 
-      const nextPosition = warpPosition(
-        getNextPositionByDirection(updatedSnake.head, updatedSnake.direction),
-        graph
-      )
+      if (!nextPosition) {
+        updatedSnake.setDead(true)
+        nextState.snakes.push(updatedSnake)
+        continue
+      }
 
       const nextCell = checkCellAhead(nextPosition, graph)
       const nextCellType = nextCell && nextCell.value.type
@@ -64,7 +92,7 @@ const main = () => {
         case graph.CELL_TYPE.food:
           updatedSnake.grow(nextPosition)
           if (nextCell) {
-            updatedFoods = [
+            nextState.foods = [
               ...Logic.FoodModel.clearFoodById(foods, nextCell.value.id),
               Logic.FoodModel.createFood(),
             ]
@@ -85,11 +113,11 @@ const main = () => {
           break
       }
 
-      updatedSnakes.push(updatedSnake)
+      nextState.snakes.push(updatedSnake)
     }
 
-    Logic.updateState({snakes: updatedSnakes, foods: updatedFoods})
-    console.log('[UPDATE end]')
+    Logic.updateState(nextState)
+    // console.log('[UPDATE end]')
   }
 
   Logic.createLoopFactory({

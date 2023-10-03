@@ -15,15 +15,15 @@ const gridSize = pixelsToCells(adjPageSizes.w, adjPageSizes.h)
 
 export const $graph = createStore(new GridGraph(gridSize))
 $graph.watch((g) => {
-  console.log('[GRAPH STATE UPDATED]: ', g)
-  console.log(
-    'foods: ',
-    g.graph.filter((v) => v.value.type === 1)
-  )
-  console.log(
-    'snakes: ',
-    g.graph.filter((v) => v.value.type === 2)
-  )
+  // console.log('[GRAPH STATE UPDATED]: ', g)
+  // console.log(
+  //   'foods: ',
+  //   g.graph.filter((v) => v.value.type === 1)
+  // )
+  // console.log(
+  //   'snakes: ',
+  //   g.graph.filter((v) => v.value.type === 2)
+  // )
 })
 
 export const updateGraph = createEvent<UpdatePayload>()
@@ -55,13 +55,13 @@ function placeObjectsInGraph({
   foods,
 }: {graph: GridGraph} & UpdatePayload) {
   for (const [coords, id] of foods) {
-    const index = graph.coordsToIndex(coords[0], coords[1])
+    const index = graph.coordsToIndex(coords)
     graph.setValueByIndex(index, {type: graph.CELL_TYPE.food, id})
   }
 
   for (const snake of snakes) {
     for (const segment of snake.body) {
-      const index = graph.coordsToIndex(segment[0], segment[1])
+      const index = graph.coordsToIndex(segment)
       graph.setValueByIndex(index, {type: graph.CELL_TYPE.snake, id: snake.id})
     }
   }
