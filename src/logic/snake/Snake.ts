@@ -1,16 +1,16 @@
 import {DIRECTIONS} from '@app/shared'
 
 const snakeColors = [
-  '#FF4081', // Vibrant Pink
-  '#40C4FF', // Bright Sky Blue
-  '#FFAB40', // Vibrant Orange
-  '#7E57C2', // Deep Lavender
-  '#69F0AE', // Electric Green
-  '#FF5252', // Bright Red
-  '#FFD740', // Bright Yellow
-  '#00E5FF', // Cyan
-  '#536DFE', // Blue
-  '#B2FF59', // Lime Green
+  '#F6a0f1',
+  '#40C4FF',
+  '#FFAB40',
+  '#aEa7f0',
+  '#69F0AE',
+  '#ff62aa',
+  '#FFD740',
+  '#f0E5FF',
+  '#03fafE',
+  '#B2FF59',
 ]
 
 type SnakeConstructor = {

@@ -31,8 +31,8 @@ const main = () => {
     for (const snake of snakes) {
       drawSnake({ctx, snake, graph})
     }
-
     drawGrid(ctx, grid)
+    console.log('[RENDER end]')
   }
   const updateFn = ({state}: WithState) => {
     const {snakes, foods} = state
@@ -89,6 +89,7 @@ const main = () => {
     }
 
     Logic.updateState({snakes: updatedSnakes, foods: updatedFoods})
+    console.log('[UPDATE end]')
   }
 
   Logic.createLoopFactory({

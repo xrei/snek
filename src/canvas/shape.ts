@@ -34,9 +34,12 @@ export function drawText({
   const [x, y] = cellPosToPixelPos(pos)
   const idx = graph?.coordsToIndex(...pos).toString() ?? ''
   console.log(graph, idx)
-  ctx.fillStyle = color
 
-  ctx.fillText(idx, x + EDGE_GAP, y + EDGE_GAP + CELL_SIZE / 2)
+  ctx.font = `${Math.floor(CELL_SIZE * 0.5)}px Arial`
+  ctx.fillStyle = color
+  ctx.textAlign = 'center'
+
+  ctx.fillText(idx, EDGE_GAP + x + CELL_SIZE / 2, EDGE_GAP + y + CELL_SIZE / 2)
 }
 
 export function drawFood({ctx, food}: DrawFoodParams) {
@@ -58,12 +61,12 @@ export function drawSnake({ctx, snake, graph}: DrawSnakeParams) {
       color: isDead ? deadColor : color,
     })
 
-    if (graph) {
-      drawText({
-        ctx,
-        pos: segment,
-        graph,
-      })
-    }
+    // if (graph) {
+    //   drawText({
+    //     ctx,
+    //     pos: segment,
+    //     graph,
+    //   })
+    // }
   }
 }

@@ -15,7 +15,7 @@ const gridSize = pixelsToCells(adjPageSizes.w, adjPageSizes.h)
 
 export const $graph = createStore(new GridGraph(gridSize))
 $graph.watch((g) => {
-  console.log('graph: ', g)
+  console.log('[GRAPH STATE UPDATED]: ', g)
   console.log(
     'foods: ',
     g.graph.filter((v) => v.value.type === 1)

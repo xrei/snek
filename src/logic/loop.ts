@@ -35,8 +35,9 @@ export const createLoopFactory = <T>({
 
   const willTick = merge([loopFx.done, GameModel.play])
 
-  $tick.on(loopFx.done, (_, {params}) => params as number)
-  // $tick.updates.watch(console.log)
+  $tick
+    .on(loopFx.done, (_, {params}) => params as number)
+    .reset(GameModel.restart)
 
   sample({
     clock: [start, willTick],
@@ -46,16 +47,14 @@ export const createLoopFactory = <T>({
     target: loopFx,
   })
 
-  const doUpdate = sample({
-    clock: loopFx.done,
-    source: $state,
-    fn: (state) => state,
-  })
+  const doUpdate = sample({clock: loopFx, source: $state})
+  const doRender = sample({clock: loopFx.done, source: $state})
 
   doUpdate.watch((state) => {
     updateFn({state})
-    renderFn({state})
   })
+
+  doRender.watch((state) => renderFn({state}))
 
   GameModel.restart.watch(() => {
     renderFn({state: $state.getState()})
