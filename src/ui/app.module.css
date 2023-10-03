@@ -1,0 +1,9 @@
+.app {
+  user-select: none;
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 10;
+  min-width: 200px;
+}
+
