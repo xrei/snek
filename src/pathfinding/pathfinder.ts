@@ -5,7 +5,7 @@ import {manhattanDistance} from './heuristic'
 
 type NavigationResult = {
   path: number[]
-  processed: Vertex[]
+  processed: number[]
   nextMove?: Coords
 }
 

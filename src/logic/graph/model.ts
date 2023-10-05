@@ -55,16 +55,16 @@ export function placeObjectsInGraph({
   snakes,
   foods,
 }: {graph: GridGraph} & UpdatePayload) {
-  for (const [coords, id] of foods) {
-    const index = graph.coordsToIndex(coords)
-    graph.setValueByIndex(index, {type: graph.CELL_TYPE.food, id})
-  }
-
   for (const snake of snakes) {
     for (const segment of snake.body) {
       const index = graph.coordsToIndex(segment)
       graph.setValueByIndex(index, {type: graph.CELL_TYPE.snake, id: snake.id})
     }
+  }
+
+  for (const [coords, id] of foods) {
+    const index = graph.coordsToIndex(coords)
+    graph.setValueByIndex(index, {type: graph.CELL_TYPE.food, id})
   }
 }
 

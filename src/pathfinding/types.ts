@@ -4,7 +4,7 @@ export type findPath = (
   start: Vertex,
   goal: Vertex,
   graph: GridGraph
-) => {path: number[]; processed: Vertex[]}
+) => {path: number[]; processed: number[]}
 
 export enum Strategies {
   'bfs' = 'bfs',

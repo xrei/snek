@@ -2,7 +2,6 @@ import {createEvent, createStore, sample} from 'effector'
 import {Snake} from './Snake'
 import {getRandomPosition} from '@app/canvas'
 import {Strategies} from '@app/pathfinding/types'
-import {Vertex} from '@app/shared/graph'
 import {sortDescBy} from '@app/shared'
 
 const initialSnakes = () => {
@@ -27,7 +26,7 @@ const createAiSnake = (id: number) =>
 type SnakeNavigationDetails = {
   snakeId: string
   path: number[]
-  processed: Vertex[]
+  processed: number[]
 }
 export const $snakes = createStore<Snake[]>(initialSnakes())
 export const $snakesByScore = $snakes.map((state) => sortDescBy('score', state))

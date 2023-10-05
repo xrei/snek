@@ -33,7 +33,7 @@ export const bfs: findPath = (start, goal, graph) => {
     }
   }
 
-  const processed = Object.values(parent)
+  const processed = Object.values(parent).map((v) => v.index)
 
   return {
     path,
