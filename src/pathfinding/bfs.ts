@@ -6,8 +6,6 @@ export const bfs: findPath = (start, goal, graph) => {
   const parent: Record<number, Vertex> = {}
   let found = false
 
-  if (!goal || !start) return {path: [], processed: []}
-
   while (frontier.length !== 0) {
     const current = frontier.shift()!
 
@@ -24,13 +22,13 @@ export const bfs: findPath = (start, goal, graph) => {
       }
     }
   }
-  const path: Vertex[] = []
+  const path: number[] = []
 
   if (found) {
     let current = goal
 
     while (current.index !== start.index) {
-      path.unshift(current)
+      path.unshift(current.index)
       current = parent[current.index]
     }
   }

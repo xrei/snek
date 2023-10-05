@@ -4,46 +4,33 @@ import {findPath, Strategies} from './types'
 import {manhattanDistance} from './heuristic'
 
 type NavigationResult = {
-  path: Vertex[]
+  path: number[]
   processed: Vertex[]
   nextMove?: Coords
 }
 
 type determinePathParams = {
-  start: Coords
-  goal: Vertex | null
+  start: Vertex
+  goal: Vertex | undefined
   graph: GridGraph
 }
 
 export const determinePath =
   (strategy: findPath) =>
-  ({goal, start, graph}: determinePathParams): NavigationResult | false => {
-    if (!goal) return false
+  ({goal, start, graph}: determinePathParams): NavigationResult | null => {
+    if (!goal) return null
 
-    const startPos = graph.coordsToVertex(start)
-    if (!startPos) return false
+    const startPos = start
 
     const {path, processed} = strategy(startPos, goal, graph)
 
-    if (!path.length) {
-      for (const x of startPos.neighbors) {
-        const cell = graph.getVertex(x)
-        if (cell && cell.value.type !== graph.CELL_TYPE.snake) {
-          return {
-            path,
-            processed,
-            nextMove: graph.indexToCoords(cell.index),
-          }
-        }
-      }
-      return {path, processed}
-    }
-    const nextMove = graph.indexToCoords(path[0].index)
+    if (!path.length) return null
 
+    const nextMove = graph.indexToCoords(path[0])
     return {
       path,
       processed,
-      nextMove: nextMove,
+      nextMove,
     }
   }
 
@@ -59,7 +46,7 @@ export const createPathfinder = (strategyName: Strategies) => {
   return determinePath(strategy)
 }
 
-export const findClosesObject = (fromPoint: Coords, xs: Coords[]) => {
+export const findClosestObject = (fromPoint: Coords, xs: Coords[]) => {
   let closest = xs[0]
   let distance = manhattanDistance(fromPoint, closest)
 

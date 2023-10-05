@@ -9,9 +9,9 @@ export const App = () => {
   return (
     <div className={styles.app}>
       <div className="flex flex-col gap-3 p-4 bg-slate-200 bg-opacity-70 rounded">
-        <Score />
         <Settings />
         <GameControls />
+        <Score />
       </div>
     </div>
   )
@@ -84,7 +84,7 @@ const GameControls = () => {
       <div>
         <button
           className={btnClass}
-          onClick={() => Logic.SnakeModel.addAiSnake()}
+          onClick={() => Logic.SnakeModel.addBotSnake()}
         >
           Add bot
         </button>

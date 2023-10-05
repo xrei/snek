@@ -4,6 +4,7 @@ import {GridGraph} from '@app/shared/graph'
 import {StoreValue, combine, createEvent, createStore, sample} from 'effector'
 import {FoodModel} from '../food'
 import {SnakeModel} from '../snake'
+import {Snake} from '../snake/Snake'
 
 type UpdatePayload = {
   snakes: StoreValue<typeof SnakeModel.$snakes>
@@ -49,7 +50,7 @@ sample({
   target: $graph,
 })
 
-function placeObjectsInGraph({
+export function placeObjectsInGraph({
   graph,
   snakes,
   foods,
@@ -65,4 +66,26 @@ function placeObjectsInGraph({
       graph.setValueByIndex(index, {type: graph.CELL_TYPE.snake, id: snake.id})
     }
   }
+}
+
+export function updateSnakeInGraph({
+  graph,
+  oldSnake,
+  nextSnake,
+}: {
+  graph: GridGraph
+  oldSnake: Snake
+  nextSnake: Snake
+}) {
+  const head = nextSnake.head
+  const tail = oldSnake.body[oldSnake.body.length - 1]
+
+  graph.setValueByIndex(graph.coordsToIndex(head), {
+    type: graph.CELL_TYPE.snake,
+    id: nextSnake.id,
+  })
+
+  graph.setValueByIndex(graph.coordsToIndex(tail), {
+    type: graph.CELL_TYPE.empty,
+  })
 }

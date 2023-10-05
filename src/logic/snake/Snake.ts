@@ -2,14 +2,14 @@ import {Strategies} from '@app/pathfinding/types'
 import {DIRECTIONS} from '@app/shared'
 
 const snakeColors = [
-  '#F6a0f1',
+  '#F6a040',
   '#40C4FF',
-  '#FFAB40',
+  '#7ffB40',
   '#aEa7f0',
   '#69F0AE',
   '#ff62aa',
-  '#FFD740',
-  '#f0E5FF',
+  '#aa5f2f',
+  '#f4a5FF',
   '#03fafE',
   '#B2FF59',
 ]
@@ -96,7 +96,7 @@ export class Snake {
 
 function pickColor(): {head: string; tail: string} {
   const tail = snakeColors[Math.floor(Math.random() * snakeColors.length)]
-  const head = adjustBrightness(tail, 0.9) // Increase brightness by 20% for the head
+  const head = adjustBrightness(tail, 0.7) // Increase brightness by 20% for the head
   return {head, tail}
 }
 

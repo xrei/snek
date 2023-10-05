@@ -4,9 +4,9 @@ import {clearCanvas, resizeCanvas} from './shared/canvas'
 import {createGrid, drawGrid} from './canvas/grid'
 import {Logic, State} from './logic'
 import {drawFood, drawSnake} from './canvas'
-import {InputManager, getNextPositionByDirection, warpPosition} from './shared'
+import {InputManager} from './shared'
 import {checkCellAhead} from './shared/graph'
-import {createPathfinder, findClosesObject} from './pathfinding'
+import {snakeController} from './snakeController'
 
 const inputManager = new InputManager()
 
@@ -24,96 +24,79 @@ const main = () => {
   drawGrid(ctx, grid)
 
   const renderFn = ({state}: WithState) => {
-    const {foods, snakes, graph} = state
+    const {foods, snakes, graph, snakesPathData} = state
+
+    console.log('state at render: ', state)
     clearCanvas(ctx)
 
-    drawFood({ctx, food: foods})
-
     for (const snake of snakes) {
-      drawSnake({ctx, snake, graph})
+      const snakePath = snakesPathData[snake.id]?.path ?? []
+
+      drawSnake({ctx, snake, graph, snakePath})
     }
+
+    drawFood({ctx, food: foods, graph})
     drawGrid(ctx, grid)
     // console.log('[RENDER end]')
   }
   const updateFn = ({state}: WithState) => {
     const {snakes, foods} = state
     const graph = state.graph.clone()
-    const inputDirection = inputManager.getDirection()
     const nextState: {snakes: typeof state.snakes; foods: typeof state.foods} =
       {
-        snakes: [],
+        snakes: snakes.map((snake) => snake.clone()),
         foods: [...foods],
       }
 
-    for (const snake of snakes) {
+    for (const snake of nextState.snakes) {
       if (snake.isDead) {
-        nextState.snakes.push(snake)
         continue
       }
-      const updatedSnake = snake.clone()
+      const oldSnake = snake
 
-      let nextPosition: Coords | undefined
+      const {path, processed, nextCoords} = snakeController({
+        graph,
+        snake,
+        foods: nextState.foods,
+        inputManager,
+      })
 
-      if (updatedSnake.isAi && updatedSnake.aiStrategy) {
-        const pathfinder = createPathfinder(updatedSnake.aiStrategy)
-        const res = pathfinder({
-          goal:
-            graph.coordsToVertex(
-              findClosesObject(
-                updatedSnake.head,
-                nextState.foods.map((v) => v[0])
-              )
-            ) ?? null,
-          graph,
-          start: updatedSnake.head,
-        })
-
-        nextPosition = res ? res.nextMove : undefined
-      } else {
-        if (Number.isInteger(inputDirection)) {
-          updatedSnake.setDirection(inputDirection)
-        }
-        nextPosition = warpPosition(
-          getNextPositionByDirection(updatedSnake.head, updatedSnake.direction),
-          graph
-        )
-      }
-
-      if (!nextPosition) {
-        updatedSnake.setDead(true)
-        nextState.snakes.push(updatedSnake)
+      if (!nextCoords) {
+        snake.setDead(true)
+        Logic.GameModel.pause()
         continue
       }
 
-      const nextCell = checkCellAhead(nextPosition, graph)
+      Logic.SnakeModel.addSnakeNavDetails({
+        snakeId: snake.id,
+        path,
+        processed,
+      })
+
+      const nextCell = checkCellAhead(nextCoords, graph)!
       const nextCellType = nextCell && nextCell.value.type
 
       switch (nextCellType) {
         case graph.CELL_TYPE.food:
-          updatedSnake.grow(nextPosition)
-          if (nextCell) {
-            nextState.foods = [
-              ...Logic.FoodModel.clearFoodById(foods, nextCell.value.id),
-              Logic.FoodModel.createFood(),
-            ]
-          }
+          snake.grow(nextCoords)
+          nextState.foods = Logic.FoodModel.createFoodIfExist(
+            Logic.FoodModel.clearFoodById(foods, nextCell.value.id),
+            graph
+          )
           break
 
         case graph.CELL_TYPE.snake:
-          updatedSnake.setDead(true)
+          snake.setDead(true)
           Logic.GameModel.pause()
           break
 
         case graph.CELL_TYPE.empty:
-          updatedSnake.move(nextPosition)
-          break
-
         default:
-          updatedSnake.move(nextPosition)
+          snake.move(nextCoords)
           break
       }
 
-      nextState.snakes.push(updatedSnake)
+      Logic.GraphModel.updateSnakeInGraph({graph, nextSnake: snake, oldSnake})
     }
 
     Logic.updateState(nextState)

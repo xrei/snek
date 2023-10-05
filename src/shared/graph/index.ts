@@ -64,7 +64,7 @@ export class GridGraph {
   }
 
   getVertex(index?: number) {
-    return index ? this.graph[index] : undefined
+    return typeof index === 'number' ? this.graph[index] : undefined
   }
 
   coordsToVertex(vx: Coords) {
@@ -100,4 +100,15 @@ export function checkCellAhead(nextPos: Coords, graph: GridGraph) {
   const vertex = graph.getVertex(index)
 
   return vertex
+}
+
+export function getRandomEmptyCell(graph: GridGraph) {
+  const empty = graph.graph.filter(
+    (v) => v.value.type === graph.CELL_TYPE.empty
+  )
+  if (!empty.length) return null
+
+  const randomIdx = empty[Math.floor(Math.random() * empty.length)]
+
+  return graph.indexToCoords(randomIdx.index)
 }

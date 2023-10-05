@@ -16,6 +16,16 @@ type DrawFoodParams = Omit<GenericDrawParams, 'pos'> & {
 }
 type DrawSnakeParams = Omit<GenericDrawParams, 'pos'> & {
   snake: Snake
+  snakePath: number[]
+  graph: GridGraph
+}
+
+type DrawPathParams = {
+  ctx: CanvasRenderingContext2D
+  path: number[]
+  graph: GridGraph
+  color: string
+  offsetIdx: number
 }
 
 export function drawSquare({ctx, pos, color = 'green'}: GenericDrawParams) {
@@ -46,20 +56,40 @@ export function drawText({
   )
 }
 
-export function drawFood({ctx, food}: DrawFoodParams) {
+export function drawFood({ctx, food, graph}: DrawFoodParams) {
+  const isDebug = GameModel.$isDebug.getState()
+
   for (const val of food) {
     drawSquare({ctx, pos: val[0]})
+
+    if (isDebug) {
+      drawText({
+        ctx,
+        pos: val[0],
+        graph,
+      })
+    }
   }
 }
 
-export function drawSnake({ctx, snake, graph}: DrawSnakeParams) {
+export function drawSnake({ctx, snake, snakePath, graph}: DrawSnakeParams) {
   const isDebug = GameModel.$isDebug.getState()
+
+  if (snake.isAi && isDebug) {
+    drawPath({
+      ctx,
+      color: snake.isDead ? ctx.canvas.style.background : snake.color.head,
+      graph,
+      path: snakePath,
+      offsetIdx: getDigitsFromId(snake.id),
+    })
+  }
 
   for (const segment of snake.body) {
     const isDead = snake.isDead
     const isHead = snake.head === segment
     const color = isHead ? snake.color.head : snake.color.tail
-    const deadColor = '#212'
+    const deadColor = isHead ? '#212' : '#333'
 
     drawSquare({
       ctx,
@@ -75,4 +105,45 @@ export function drawSnake({ctx, snake, graph}: DrawSnakeParams) {
       })
     }
   }
+}
+
+export function drawPath({ctx, path, graph, color, offsetIdx}: DrawPathParams) {
+  if (!path.length) return
+
+  const offsetAmount = 3
+  const centered = (n: number) => n + EDGE_GAP + CELL_SIZE / 2
+  const calcOffset = (n: number) =>
+    n + offsetAmount * Math.sin((offsetIdx * 2 * Math.PI) / 4)
+
+  ctx.beginPath()
+  ctx.strokeStyle = color
+  ctx.lineWidth = 2
+
+  const startCoords = graph.indexToCoords(path[0])
+  const startPxCoords = cellPosToPixelPos(startCoords)
+
+  const adjCoords: Coords = [
+    calcOffset(centered(startPxCoords[0])),
+    calcOffset(centered(startPxCoords[1])),
+  ]
+
+  ctx.moveTo(...adjCoords)
+
+  for (let i = 1; i < path.length; i++) {
+    const coords = graph.indexToCoords(path[i])
+    const pxCoords = cellPosToPixelPos(coords)
+
+    const adjCoords: Coords = [
+      calcOffset(centered(pxCoords[0])),
+      calcOffset(centered(pxCoords[1])),
+    ]
+
+    ctx.lineTo(adjCoords[0], adjCoords[1])
+  }
+  ctx.stroke()
+}
+
+function getDigitsFromId(id: string) {
+  const match = /\d+/.exec(id)
+  return match ? Number(match[0]) : 0
 }

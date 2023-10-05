@@ -2,9 +2,9 @@ import {Vertex, GridGraph} from '@app/shared/graph'
 
 export type findPath = (
   start: Vertex,
-  goal: Vertex | null,
+  goal: Vertex,
   graph: GridGraph
-) => {path: Vertex[]; processed: Vertex[]}
+) => {path: number[]; processed: Vertex[]}
 
 export enum Strategies {
   'bfs' = 'bfs',

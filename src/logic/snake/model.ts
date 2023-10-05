@@ -2,6 +2,7 @@ import {createEvent, createStore, sample} from 'effector'
 import {Snake} from './Snake'
 import {getRandomPosition} from '@app/canvas'
 import {Strategies} from '@app/pathfinding/types'
+import {Vertex} from '@app/shared/graph'
 
 const initialSnakes = () => {
   const snake = new Snake({
@@ -22,10 +23,19 @@ const createAiSnake = (id: number) =>
     aiStrategy: Strategies.bfs,
   })
 
+type SnakeNavigationDetails = {
+  snakeId: string
+  path: number[]
+  processed: Vertex[]
+}
 export const $snakes = createStore<Snake[]>(initialSnakes())
+export const $snakesPathData = createStore<{
+  [key: string]: SnakeNavigationDetails
+}>({})
 
-export const addAiSnake = createEvent()
+export const addBotSnake = createEvent()
 export const updateSnakes = createEvent<Snake[]>()
+export const addSnakeNavDetails = createEvent<SnakeNavigationDetails>()
 export const reset = createEvent()
 
 sample({
@@ -36,7 +46,7 @@ sample({
 })
 
 sample({
-  clock: addAiSnake,
+  clock: addBotSnake,
   source: $snakes,
   fn: (snakes) => {
     const len = snakes.filter((v) => v.isAi).length
@@ -46,7 +56,25 @@ sample({
 })
 
 sample({
+  clock: addSnakeNavDetails,
+  source: $snakesPathData,
+  fn: (map, data) => {
+    const id = data.snakeId
+    const copy = {...map}
+
+    copy[id] = data
+    return copy
+  },
+  target: $snakesPathData,
+})
+
+sample({
   clock: reset,
   fn: () => initialSnakes(),
-  target: $snakes,
+  target: [$snakes],
+})
+
+sample({
+  clock: reset,
+  target: $snakesPathData.reinit!,
 })

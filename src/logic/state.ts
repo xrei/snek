@@ -6,8 +6,9 @@ import {GameModel} from './game'
 
 export const $state = combine({
   foods: FoodModel.$food,
-  snakes: SnakeModel.$snakes,
   graph: GraphModel.$graph,
+  snakes: SnakeModel.$snakes,
+  snakesPathData: SnakeModel.$snakesPathData,
 })
 
 export type State = StoreValue<typeof $state>

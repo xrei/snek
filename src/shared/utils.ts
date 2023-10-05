@@ -7,7 +7,7 @@ export function genId() {
   return a + b
 }
 
-export function getNextPositionByDirection(
+export function getNextCoordsByDirection(
   [x, y]: Coords,
   direction: DIRECTIONS
 ): Coords {
@@ -25,7 +25,7 @@ export function getNextPositionByDirection(
   }
 }
 
-export function warpPosition(position: Coords, graph: GridGraph): Coords {
+export function warpCoords(position: Coords, graph: GridGraph): Coords {
   let [x, y] = position
 
   // Check and warp X coordinate
