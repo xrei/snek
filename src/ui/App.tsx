@@ -18,7 +18,7 @@ export const App = () => {
 }
 
 const Score = () => {
-  const [snakes] = useUnit([Logic.SnakeModel.$snakes])
+  const [snakes] = useUnit([Logic.SnakeModel.$snakesByScore])
 
   return (
     <div className="flex flex-col gap-1">

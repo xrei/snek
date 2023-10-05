@@ -1,3 +1,4 @@
+import {descend, prop, sort} from 'ramda'
 import {DIRECTIONS} from './config'
 import {GridGraph} from './graph'
 
@@ -43,4 +44,15 @@ export function warpCoords(position: Coords, graph: GridGraph): Coords {
   }
 
   return [x, y]
+}
+
+// eslint-disable-next-line
+export function sortDescBy<T extends Record<string, any>>(
+  key: string,
+  xs: T[]
+): T[] {
+  // @ts-expect-error unreal
+  const comp = descend(prop(key))
+
+  return sort(comp, xs)
 }

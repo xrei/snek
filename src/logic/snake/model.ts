@@ -3,6 +3,7 @@ import {Snake} from './Snake'
 import {getRandomPosition} from '@app/canvas'
 import {Strategies} from '@app/pathfinding/types'
 import {Vertex} from '@app/shared/graph'
+import {sortDescBy} from '@app/shared'
 
 const initialSnakes = () => {
   const snake = new Snake({
@@ -29,6 +30,7 @@ type SnakeNavigationDetails = {
   processed: Vertex[]
 }
 export const $snakes = createStore<Snake[]>(initialSnakes())
+export const $snakesByScore = $snakes.map((state) => sortDescBy('score', state))
 export const $snakesPathData = createStore<{
   [key: string]: SnakeNavigationDetails
 }>({})
