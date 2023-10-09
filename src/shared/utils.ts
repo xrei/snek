@@ -56,3 +56,8 @@ export function sortDescBy<T extends Record<string, any>>(
 
   return sort(comp, xs)
 }
+
+export function getDigitsFromId(id: string) {
+  const match = /\d+/.exec(id)
+  return match ? Number(match[0]) : 0
+}

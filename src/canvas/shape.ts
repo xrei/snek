@@ -1,6 +1,6 @@
-import {CELL_SIZE, EDGE_GAP} from '@app/shared'
+import {CELL_SIZE, EDGE_GAP, getDigitsFromId} from '@app/shared'
 import {cellPosToPixelPos} from './utils'
-import {Snake} from '@app/logic/snake/Snake'
+import {Snake, SnakeNavDetsMap} from '@app/logic/snake'
 import {GridGraph} from '@app/shared/graph'
 import {GameModel} from '@app/logic/game'
 
@@ -14,9 +14,10 @@ type GenericDrawParams = {
 type DrawFoodParams = Omit<GenericDrawParams, 'pos'> & {
   food: Food[]
 }
+
 type DrawSnakeParams = Omit<GenericDrawParams, 'pos'> & {
-  snake: Snake
-  snakePath: number[]
+  snakes: Snake[]
+  snakePaths: SnakeNavDetsMap
   graph: GridGraph
 }
 
@@ -26,6 +27,7 @@ type DrawPathParams = {
   graph: GridGraph
   color: string
   offsetIdx: number
+  offsetLen: number
 }
 
 export function drawSquare({ctx, pos, color = 'green'}: GenericDrawParams) {
@@ -72,48 +74,61 @@ export function drawFood({ctx, food, graph}: DrawFoodParams) {
   }
 }
 
-export function drawSnake({ctx, snake, snakePath, graph}: DrawSnakeParams) {
+export function drawSnake({ctx, snakes, snakePaths, graph}: DrawSnakeParams) {
   const isDebug = GameModel.$isDebug.getState()
 
-  if (snake.isAi && isDebug) {
-    drawPath({
-      ctx,
-      color: snake.isDead ? ctx.canvas.style.background : snake.color.head,
-      graph,
-      path: snakePath,
-      offsetIdx: getDigitsFromId(snake.id),
-    })
-  }
+  for (const snake of snakes) {
+    const snakePath = snakePaths[snake.id]?.path ?? []
 
-  for (const segment of snake.body) {
-    const isDead = snake.isDead
-    const isHead = snake.head === segment
-    const color = isHead ? snake.color.head : snake.color.tail
-    const deadColor = isHead ? '#212' : '#333'
+    if (snake.isAi && isDebug) {
+      drawPath({
+        ctx,
+        color: snake.isDead ? ctx.canvas.style.background : snake.color.head,
+        graph,
+        path: snakePath,
+        offsetIdx: getDigitsFromId(snake.id),
+        offsetLen: snakes.length,
+      })
+    }
 
-    drawSquare({
-      ctx,
-      pos: segment,
-      color: isDead ? deadColor : color,
-    })
+    for (const segment of snake.body) {
+      const isDead = snake.isDead
+      const isHead = snake.head === segment
+      const color = isHead ? snake.color.head : snake.color.tail
+      const deadColor = isHead ? '#212' : 'rgba(66, 66, 66, 40)'
 
-    if (isDebug) {
-      drawText({
+      drawSquare({
         ctx,
         pos: segment,
-        graph,
+        color: isDead ? deadColor : color,
       })
+
+      if (isDebug) {
+        drawText({
+          ctx,
+          pos: segment,
+          graph,
+        })
+      }
     }
   }
 }
 
-export function drawPath({ctx, path, graph, color, offsetIdx}: DrawPathParams) {
+export function drawPath({
+  ctx,
+  path,
+  graph,
+  color,
+  offsetIdx,
+  offsetLen,
+}: DrawPathParams) {
   if (!path.length) return
 
   const offsetAmount = 3
+  const offsetMinLen = offsetLen < 4 ? 4 : offsetLen
   const centered = (n: number) => n + EDGE_GAP + CELL_SIZE / 2
   const calcOffset = (n: number) =>
-    n + offsetAmount * Math.sin((offsetIdx * 2 * Math.PI) / 4)
+    n + offsetAmount * Math.sin((offsetIdx * 2 * Math.PI) / offsetMinLen)
 
   ctx.beginPath()
   ctx.strokeStyle = color
@@ -133,17 +148,10 @@ export function drawPath({ctx, path, graph, color, offsetIdx}: DrawPathParams) {
     const coords = graph.indexToCoords(path[i])
     const pxCoords = cellPosToPixelPos(coords)
 
-    const adjCoords: Coords = [
+    ctx.lineTo(
       calcOffset(centered(pxCoords[0])),
-      calcOffset(centered(pxCoords[1])),
-    ]
-
-    ctx.lineTo(adjCoords[0], adjCoords[1])
+      calcOffset(centered(pxCoords[1]))
+    )
   }
   ctx.stroke()
-}
-
-function getDigitsFromId(id: string) {
-  const match = /\d+/.exec(id)
-  return match ? Number(match[0]) : 0
 }

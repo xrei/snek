@@ -1,7 +1,7 @@
 import {Snake} from './logic/snake/Snake'
-import {createPathfinder, findClosestObject} from './pathfinding'
+import {createPathfinder, findReachableClosestObject} from './pathfinding'
 import {InputManager, getNextCoordsByDirection, warpCoords} from './shared'
-import {GridGraph} from './shared/graph'
+import {GridGraph, Vertex} from './shared/graph'
 
 type SnakeBotControllerParams = {
   snake: Snake
@@ -9,8 +9,8 @@ type SnakeBotControllerParams = {
   foods: Food[]
 }
 
-function isPartOfSnakeBody(coords: Coords, snake: Snake): boolean {
-  for (const segment of snake.body) {
+function isPartOfSnakeBody(coords: Coords, body: Coords[]): boolean {
+  for (const segment of body) {
     if (segment[0] === coords[0] && segment[1] === coords[1]) {
       return true
     }
@@ -18,38 +18,54 @@ function isPartOfSnakeBody(coords: Coords, snake: Snake): boolean {
   return false
 }
 
-function snakeBotController({snake, graph, foods}: SnakeBotControllerParams) {
-  const pathfinder = createPathfinder(snake.aiStrategy!)
-  const startVertex = graph.coordsToVertex(snake.head)!
-
-  const res = pathfinder({
-    goal: graph.coordsToVertex(
-      findClosestObject(
-        snake.head,
-        foods.map((v) => v[0])
-      )
-    ),
-    graph,
-    start: startVertex,
-  })
-
-  if (res) return res
-
+function getNextNearestMove(start: Vertex, body: Coords[], graph: GridGraph) {
   let nextMove
 
-  for (const x of startVertex.neighbors) {
+  for (const x of start.neighbors) {
     const cell = graph.getVertex(x)!
     const nextCoords = graph.indexToCoords(cell.index)
 
     if (
       cell &&
       cell.value.type !== graph.CELL_TYPE.snake &&
-      !isPartOfSnakeBody(nextCoords, snake)
+      !isPartOfSnakeBody(nextCoords, body)
     ) {
       nextMove = nextCoords
       break
     }
   }
+
+  return nextMove
+}
+
+function snakeBotController({snake, graph, foods}: SnakeBotControllerParams) {
+  const pathfinder = createPathfinder(snake.aiStrategy!)
+  const startVertex = graph.coordsToVertex(snake.head)!
+
+  const reachableFood = findReachableClosestObject({
+    fromPoint: snake.head,
+    objects: foods.map((v) => v[0]),
+    graph,
+    strategy: snake.aiStrategy!,
+  })
+
+  if (!reachableFood) {
+    return {
+      path: [],
+      processed: [],
+      nextMove: getNextNearestMove(startVertex, snake.body, graph),
+    }
+  }
+
+  const res = pathfinder({
+    goal: reachableFood,
+    graph,
+    start: startVertex,
+  })
+
+  if (res) return res
+
+  const nextMove = getNextNearestMove(startVertex, snake.body, graph)
 
   return {path: [], processed: [], nextMove}
 }
@@ -86,7 +102,7 @@ export function snakeController({
 }: SnakeBotControllerParams & SnakeUserControllerParams) {
   if (snake.isAi) {
     const res = snakeBotController({snake, graph, foods})
-    console.log(res)
+
     return {
       path: res?.path ?? [],
       processed: res?.processed ?? [],

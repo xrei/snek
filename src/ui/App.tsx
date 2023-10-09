@@ -8,7 +8,7 @@ const {GameModel} = Logic
 export const App = () => {
   return (
     <div className={styles.app}>
-      <div className="flex flex-col gap-3 p-4 bg-slate-200 bg-opacity-70 rounded">
+      <div className="flex flex-col gap-3 p-4 bg-slate-100 bg-opacity-50 rounded">
         <Settings />
         <GameControls />
         <Score />
@@ -23,13 +23,21 @@ const Score = () => {
   return (
     <div className="flex flex-col gap-1">
       {snakes.map((s) => (
-        <div
-          key={s.id}
-          className="flex gap-4"
-          style={{color: s.isDead ? 'black' : s.color.head}}
-        >
-          <span>{s.id}</span>
-          <span>{s.score}</span>
+        <div key={s.id} className="flex gap-4 items-center justify-center">
+          <div className="flex-1 gap-4 flex font-semibold">
+            <span style={{color: s.isDead ? 'black' : s.color.head}}>
+              {s.id}
+            </span>
+            <span>{s.score}</span>
+          </div>
+          <div>
+            <button
+              className="px-1"
+              onClick={() => Logic.SnakeModel.removeSnake(s.id)}
+            >
+              ❌
+            </button>
+          </div>
         </div>
       ))}
     </div>
@@ -60,7 +68,7 @@ const Settings = () => {
 
 const GameControls = () => {
   const [isPlaying] = useUnit([GameModel.$gameIsPlaying])
-  const btnClass = clsx('w-full text-sm px-3 py-1 bg-white')
+  const btnClass = clsx('w-full text-xs px-1 py-1 bg-white')
 
   return (
     <div className="flex flex-col gap-1">

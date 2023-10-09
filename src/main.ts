@@ -29,11 +29,7 @@ const main = () => {
     console.log('state at render: ', state)
     clearCanvas(ctx)
 
-    for (const snake of snakes) {
-      const snakePath = snakesPathData[snake.id]?.path ?? []
-
-      drawSnake({ctx, snake, graph, snakePath})
-    }
+    drawSnake({ctx, snakes, graph, snakePaths: snakesPathData})
 
     drawFood({ctx, food: foods, graph})
     drawGrid(ctx, grid)

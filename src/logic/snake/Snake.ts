@@ -11,7 +11,8 @@ const snakeColors = [
   '#aa5f2f',
   '#f4a5FF',
   '#03fafE',
-  '#B2FF59',
+  '#fff03a',
+  '#ff00aa',
 ]
 
 type SnakeConstructor = {
@@ -96,7 +97,7 @@ export class Snake {
 
 function pickColor(): {head: string; tail: string} {
   const tail = snakeColors[Math.floor(Math.random() * snakeColors.length)]
-  const head = adjustBrightness(tail, 0.7) // Increase brightness by 20% for the head
+  const head = adjustBrightness(tail, 0.7)
   return {head, tail}
 }
 

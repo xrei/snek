@@ -5,3 +5,6 @@ export const SnakeModel = {
   Snake,
   ...model,
 }
+
+export type * from './Snake'
+export type * from './model'

@@ -11,8 +11,14 @@ type NavigationResult = {
 
 type determinePathParams = {
   start: Vertex
-  goal: Vertex | undefined
+  goal?: Vertex | null
   graph: GridGraph
+}
+export const StrategiesMap: Record<Strategies, findPath> = {
+  [Strategies.bfs]: bfs,
+  [Strategies.dfs]: bfs,
+  [Strategies.dijkstra]: bfs,
+  [Strategies.astar]: bfs,
 }
 
 export const determinePath =
@@ -20,9 +26,7 @@ export const determinePath =
   ({goal, start, graph}: determinePathParams): NavigationResult | null => {
     if (!goal) return null
 
-    const startPos = start
-
-    const {path, processed} = strategy(startPos, goal, graph)
+    const {path, processed} = strategy(start, goal, graph)
 
     if (!path.length) return null
 
@@ -34,12 +38,6 @@ export const determinePath =
     }
   }
 
-export const StrategiesMap: Record<Strategies, findPath> = {
-  [Strategies.bfs]: bfs,
-  [Strategies.dfs]: bfs,
-  [Strategies.dijkstra]: bfs,
-  [Strategies.astar]: bfs,
-}
 export const createPathfinder = (strategyName: Strategies) => {
   const strategy = StrategiesMap[strategyName]
 
@@ -59,4 +57,42 @@ export const findClosestObject = (fromPoint: Coords, xs: Coords[]) => {
   }
 
   return closest
+}
+
+export const findReachableClosestObject = ({
+  fromPoint,
+  strategy,
+  graph,
+  objects,
+}: {
+  fromPoint: Coords
+  strategy: Strategies
+  graph: GridGraph
+  objects: Coords[]
+}) => {
+  const pathfinder = createPathfinder(strategy)
+
+  const distances = objects.map((x) => ({
+    coords: x,
+    distance: manhattanDistance(fromPoint, x),
+  }))
+
+  distances.sort((a, b) => a.distance - b.distance)
+
+  for (const {coords} of distances) {
+    const startVertex = graph.coordsToVertex(fromPoint)!
+    const goalVertex = graph.coordsToVertex(coords)!
+
+    const result = pathfinder({
+      start: startVertex,
+      goal: goalVertex,
+      graph,
+    })
+
+    if (result && result.path.length > 0) {
+      return goalVertex
+    }
+  }
+
+  return null
 }
