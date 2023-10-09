@@ -53,9 +53,8 @@ sample({
   clock: addBotSnake,
   source: $snakes,
   fn: (snakes) => {
-    const len = Math.max(
-      ...snakes.map((v) => (v.isAi ? getDigitsFromId(v.id) : 0))
-    )
+    const ids = snakes.map((v) => (v.isAi ? getDigitsFromId(v.id) : 0))
+    const len = !ids.length ? 0 : Math.max(...ids)
     return [...snakes, createAiSnake(len + 1)]
   },
   target: $snakes,
