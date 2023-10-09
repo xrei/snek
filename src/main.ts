@@ -26,7 +26,6 @@ const main = () => {
   const renderFn = ({state}: WithState) => {
     const {foods, snakes, graph, snakesPathData} = state
 
-    console.log('state at render: ', state)
     clearCanvas(ctx)
 
     drawSnake({ctx, snakes, graph, snakePaths: snakesPathData})
