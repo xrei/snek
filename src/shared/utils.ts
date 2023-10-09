@@ -26,6 +26,16 @@ export function getNextCoordsByDirection(
   }
 }
 
+export function calcNextDirection(current: Coords, next?: Coords) {
+  if (!next) return null
+  if (next[0] < current[0]) return DIRECTIONS.LEFT
+  if (next[0] > current[0]) return DIRECTIONS.RIGHT
+  if (next[1] < current[1]) return DIRECTIONS.UP
+  if (next[1] > current[1]) return DIRECTIONS.DOWN
+
+  return null
+}
+
 export function warpCoords(position: Coords, graph: GridGraph): Coords {
   let [x, y] = position
 

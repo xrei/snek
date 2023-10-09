@@ -1,6 +1,11 @@
 import {Snake} from './logic/snake/Snake'
 import {createPathfinder, findReachableClosestObject} from './pathfinding'
-import {InputManager, getNextCoordsByDirection, warpCoords} from './shared'
+import {
+  InputManager,
+  calcNextDirection,
+  getNextCoordsByDirection,
+  warpCoords,
+} from './shared'
 import {GridGraph, Vertex} from './shared/graph'
 
 type SnakeBotControllerParams = {
@@ -50,10 +55,12 @@ function snakeBotController({snake, graph, foods}: SnakeBotControllerParams) {
   })
 
   if (!reachableFood) {
+    const nextMove = getNextNearestMove(startVertex, snake.body, graph)
     return {
       path: [],
       processed: [],
-      nextMove: getNextNearestMove(startVertex, snake.body, graph),
+      nextMove,
+      nextDirection: calcNextDirection(snake.head, nextMove),
     }
   }
 
@@ -66,8 +73,9 @@ function snakeBotController({snake, graph, foods}: SnakeBotControllerParams) {
   if (res) return res
 
   const nextMove = getNextNearestMove(startVertex, snake.body, graph)
+  const nextDirection = calcNextDirection(snake.head, nextMove)
 
-  return {path: [], processed: [], nextMove}
+  return {path: [], processed: [], nextMove, nextDirection}
 }
 
 type SnakeUserControllerParams = {
@@ -83,15 +91,15 @@ function snakeUserController({
 }: SnakeUserControllerParams) {
   const inputDirection = inputManager.getDirection()
 
-  if (Number.isInteger(inputDirection)) {
-    snake.setDirection(inputDirection)
-  }
   const nextCoords = warpCoords(
     getNextCoordsByDirection(snake.head, snake.direction),
     graph
   )
 
-  return nextCoords
+  return {
+    nextCoords,
+    nextDirection: inputDirection,
+  }
 }
 
 export function snakeController({
@@ -107,13 +115,19 @@ export function snakeController({
       path: res?.path ?? [],
       processed: res?.processed ?? [],
       nextCoords: res?.nextMove,
+      nextDirection: res.nextDirection,
     }
   } else {
-    const nextCoords = snakeUserController({snake, graph, inputManager})
+    const {nextCoords, nextDirection} = snakeUserController({
+      snake,
+      graph,
+      inputManager,
+    })
     return {
       path: [],
       processed: [],
       nextCoords,
+      nextDirection,
     }
   }
 }

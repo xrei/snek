@@ -36,7 +36,7 @@ const main = () => {
   }
   const updateFn = ({state}: WithState) => {
     const {snakes, foods} = state
-    const graph = state.graph.clone()
+    const graph = state.graph
     const nextState: {snakes: typeof state.snakes; foods: typeof state.foods} =
       {
         snakes: snakes.map((snake) => snake.clone()),
@@ -49,7 +49,7 @@ const main = () => {
       }
       const oldSnake = snake
 
-      const {path, processed, nextCoords} = snakeController({
+      const {path, processed, nextCoords, nextDirection} = snakeController({
         graph,
         snake,
         foods: nextState.foods,
@@ -60,6 +60,10 @@ const main = () => {
         snake.setDead(true)
         Logic.GameModel.pause()
         continue
+      }
+
+      if (nextDirection !== null) {
+        snake.setDirection(nextDirection)
       }
 
       Logic.SnakeModel.addSnakeNavDetails({

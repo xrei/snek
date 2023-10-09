@@ -30,6 +30,11 @@ type DrawPathParams = {
   offsetLen: number
 }
 
+type DrawTextParams = GenericDrawParams & {
+  text: string
+  fontSize?: number
+}
+
 export function drawSquare({ctx, pos, color = 'green'}: GenericDrawParams) {
   const [x, y] = cellPosToPixelPos(pos)
   const size = CELL_SIZE
@@ -42,34 +47,39 @@ export function drawText({
   ctx,
   pos,
   color = 'black',
-  graph,
-}: GenericDrawParams) {
+  fontSize,
+  text,
+}: DrawTextParams) {
   const [x, y] = cellPosToPixelPos(pos)
-  const idx = graph?.coordsToIndex(pos).toString() ?? ''
 
-  ctx.font = `${Math.floor(CELL_SIZE * 0.45)}px Arial`
+  const fSize = fontSize || Math.floor(CELL_SIZE * 0.45)
+  ctx.font = `${fSize}px Arial`
   ctx.fillStyle = color
   ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
 
   ctx.fillText(
-    idx,
-    1 + EDGE_GAP + x + CELL_SIZE / 2,
+    text,
+    2 + EDGE_GAP + x + CELL_SIZE / 2,
     2 + EDGE_GAP + y + CELL_SIZE / 2
   )
+}
+
+function drawIndexText({graph, pos, ...rest}: GenericDrawParams) {
+  const idx = graph?.coordsToIndex(pos).toString() ?? ''
+
+  drawText({text: idx, pos, ...rest})
 }
 
 export function drawFood({ctx, food, graph}: DrawFoodParams) {
   const isDebug = GameModel.$isDebug.getState()
 
   for (const val of food) {
-    drawSquare({ctx, pos: val[0]})
+    // drawSquare({ctx, pos: val[0]})
+    drawText({ctx, pos: val[0], text: '🍕', fontSize: 16})
 
     if (isDebug) {
-      drawText({
-        ctx,
-        pos: val[0],
-        graph,
-      })
+      drawIndexText({ctx, pos: val[0], graph})
     }
   }
 }
@@ -104,11 +114,7 @@ export function drawSnake({ctx, snakes, snakePaths, graph}: DrawSnakeParams) {
       })
 
       if (isDebug) {
-        drawText({
-          ctx,
-          pos: segment,
-          graph,
-        })
+        drawIndexText({ctx, pos: segment, graph})
       }
     }
   }

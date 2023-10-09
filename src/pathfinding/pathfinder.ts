@@ -2,11 +2,13 @@ import {GridGraph, Vertex} from '@app/shared/graph'
 import {bfs} from './bfs'
 import {findPath, Strategies} from './types'
 import {manhattanDistance} from './heuristic'
+import {DIRECTIONS, calcNextDirection} from '@app/shared'
 
 type NavigationResult = {
   path: number[]
   processed: number[]
   nextMove?: Coords
+  nextDirection: DIRECTIONS | null
 }
 
 type determinePathParams = {
@@ -30,11 +32,15 @@ export const determinePath =
 
     if (!path.length) return null
 
+    const startCoords = graph.indexToCoords(start.index)
     const nextMove = graph.indexToCoords(path[0])
+    const nextDirection = calcNextDirection(startCoords, nextMove)
+
     return {
       path,
       processed,
       nextMove,
+      nextDirection,
     }
   }
 
