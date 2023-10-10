@@ -1,6 +1,6 @@
 import {CELL_SIZE, EDGE_GAP, getDigitsFromId} from '@app/shared'
 import {cellPosToPixelPos} from './utils'
-import {Snake, SnakeNavigationDetails} from '@app/logic/snake'
+import {Snake, SnakeNavDetsMap} from '@app/logic/snake'
 import {GridGraph} from '@app/shared/graph'
 import {GameModel} from '@app/logic/game'
 
@@ -17,7 +17,7 @@ type DrawFoodParams = Omit<GenericDrawParams, 'pos'> & {
 
 type DrawSnakeParams = Omit<GenericDrawParams, 'pos'> & {
   snakes: Snake[]
-  snakePaths: Map<string, SnakeNavigationDetails>
+  snakePaths: SnakeNavDetsMap
   graph: GridGraph
 }
 

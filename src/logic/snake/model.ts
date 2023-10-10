@@ -28,18 +28,14 @@ export type SnakeNavigationDetails = {
   path: number[]
   processed: number[]
 }
-export type SnakeNavDetsMap = {
-  [key: string]: SnakeNavigationDetails
-}
+export type SnakeNavDetsMap = Map<string, SnakeNavigationDetails>
 export const $snakes = createStore<Snake[]>(initialSnakes())
 export const $snakesByScore = $snakes.map((state) => sortDescBy('score', state))
 const $deadSnakes = $snakes.map((v) => v.filter((snake) => snake.isDead))
 export const $noPlayerSnakes = $snakes.map(
   (snakes) => snakes.filter((v) => !v.isAi).length < 1
 )
-export const $snakesPathData = createStore<Map<string, SnakeNavigationDetails>>(
-  new Map()
-)
+export const $snakesPathData = createStore<SnakeNavDetsMap>(new Map())
 
 export const addPlayerSnake = createEvent()
 export const addBotSnake = createEvent()
