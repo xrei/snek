@@ -16,7 +16,12 @@ export const bfs: findPath = (start, goal, graph) => {
 
     for (const n of current.neighbors) {
       const vertex = graph.getVertex(n)
-      if (vertex && !parent[n] && vertex.value.type !== graph.CELL_TYPE.snake) {
+      const emptyOrFood =
+        vertex &&
+        (vertex.value.type === graph.CELL_TYPE.empty ||
+          vertex.value.type === graph.CELL_TYPE.food)
+
+      if (!parent[n] && emptyOrFood) {
         frontier.push(vertex)
         parent[n] = current
       }

@@ -78,7 +78,7 @@ export function updateSnakeInGraph({
   nextSnake: Snake
 }) {
   const head = nextSnake.head
-  const tail = oldSnake.body[oldSnake.body.length - 1]
+  const tail = oldSnake.tail
 
   graph.setValueByIndex(graph.coordsToIndex(head), {
     type: graph.CELL_TYPE.snake,

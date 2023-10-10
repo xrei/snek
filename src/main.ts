@@ -6,7 +6,7 @@ import {Logic, State} from './logic'
 import {drawFood, drawSnake} from './canvas'
 import {InputManager} from './shared'
 import {checkCellAhead} from './shared/graph'
-import {snakeController} from './snakeController'
+import {snakeController} from '@app/controllers'
 
 const inputManager = new InputManager()
 
@@ -18,7 +18,7 @@ const main = () => {
   const canvas = document.getElementById('appCanvas') as HTMLCanvasElement
   const ctx = canvas.getContext('2d')!
 
-  resizeCanvas(canvas)
+  resizeCanvas(canvas, ctx)
 
   const grid = createGrid()
   drawGrid(ctx, grid)
@@ -32,7 +32,6 @@ const main = () => {
 
     drawFood({ctx, food: foods, graph})
     drawGrid(ctx, grid)
-    // console.log('[RENDER end]')
   }
   const updateFn = ({state}: WithState) => {
     const {snakes, foods} = state
@@ -57,45 +56,40 @@ const main = () => {
       })
 
       if (!nextCoords) {
-        snake.setDead(true)
+        snake.setDead()
         Logic.GameModel.pause()
         continue
       }
-
-      if (nextDirection !== null) {
-        snake.setDirection(nextDirection)
-      }
-
-      Logic.SnakeModel.addSnakeNavDetails({
-        snakeId: snake.id,
-        path,
-        processed,
-      })
 
       const nextCell = checkCellAhead(nextCoords, graph)!
       const nextCellType = nextCell && nextCell.value.type
 
       switch (nextCellType) {
         case graph.CELL_TYPE.food:
-          snake.grow(nextCoords)
-          nextState.foods = Logic.FoodModel.createFoodIfExist(
-            Logic.FoodModel.clearFoodById(foods, nextCell.value.id),
+          nextState.foods = Logic.FoodModel.clearAndCreateFood(
+            nextState.foods,
+            nextCell.value.id!,
             graph
           )
-          break
 
+          snake.grow(nextCoords)
+          break
         case graph.CELL_TYPE.snake:
-          snake.setDead(true)
-          Logic.GameModel.pause()
+          snake.setDead()
           break
-
         case graph.CELL_TYPE.empty:
         default:
+          snake.setDirection(nextDirection!)
           snake.move(nextCoords)
           break
       }
 
       Logic.GraphModel.updateSnakeInGraph({graph, nextSnake: snake, oldSnake})
+      Logic.SnakeModel.addSnakeNavDetails({
+        snakeId: snake.id,
+        path,
+        processed,
+      })
     }
 
     Logic.updateState(nextState)

@@ -26,14 +26,13 @@ export function getNextCoordsByDirection(
   }
 }
 
-export function calcNextDirection(current: Coords, next?: Coords) {
-  if (!next) return null
+export function calcNextDirection(current: Coords, next: Coords): DIRECTIONS {
   if (next[0] < current[0]) return DIRECTIONS.LEFT
   if (next[0] > current[0]) return DIRECTIONS.RIGHT
   if (next[1] < current[1]) return DIRECTIONS.UP
   if (next[1] > current[1]) return DIRECTIONS.DOWN
 
-  return null
+  throw new Error('Invalid coords provided')
 }
 
 export function warpCoords(position: Coords, graph: GridGraph): Coords {

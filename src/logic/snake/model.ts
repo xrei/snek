@@ -34,8 +34,12 @@ export type SnakeNavDetsMap = {
 export const $snakes = createStore<Snake[]>(initialSnakes())
 export const $snakesByScore = $snakes.map((state) => sortDescBy('score', state))
 const $deadSnakes = $snakes.map((v) => v.filter((snake) => snake.isDead))
+export const $noPlayerSnakes = $snakes.map(
+  (snakes) => snakes.filter((v) => !v.isAi).length < 1
+)
 export const $snakesPathData = createStore<SnakeNavDetsMap>({})
 
+export const addPlayerSnake = createEvent()
 export const addBotSnake = createEvent()
 export const removeSnake = createEvent<string>()
 export const updateSnakes = createEvent<Snake[]>()
@@ -46,6 +50,23 @@ sample({
   clock: updateSnakes,
   source: $snakes,
   fn: (_, updated) => updated,
+  target: $snakes,
+})
+
+sample({
+  clock: addPlayerSnake,
+  source: $snakes,
+  filter: $noPlayerSnakes,
+  fn: (snakes) => {
+    return [
+      ...snakes,
+      new Snake({
+        id: 'player-1',
+        initialPos: getRandomPosition(),
+        isAi: false,
+      }),
+    ]
+  },
   target: $snakes,
 })
 

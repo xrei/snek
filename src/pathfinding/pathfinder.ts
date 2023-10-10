@@ -7,7 +7,7 @@ import {DIRECTIONS, calcNextDirection} from '@app/shared'
 type NavigationResult = {
   path: number[]
   processed: number[]
-  nextMove?: Coords
+  nextMove: Coords
   nextDirection: DIRECTIONS | null
 }
 

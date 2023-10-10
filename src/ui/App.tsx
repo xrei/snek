@@ -68,7 +68,7 @@ const Settings = () => {
 
 const GameControls = () => {
   const [isPlaying] = useUnit([GameModel.$gameIsPlaying])
-  const btnClass = clsx('w-full text-xs px-1 py-1 bg-white')
+  const btnClass = clsx('w-full text-xs px-1 py-1 bg-white bg-opacity-50')
 
   return (
     <div className="flex flex-col gap-1">
@@ -89,12 +89,18 @@ const GameControls = () => {
           Reset
         </button>
       </div>
-      <div>
+      <div className="flex gap-2">
         <button
           className={btnClass}
           onClick={() => Logic.SnakeModel.addBotSnake()}
         >
           Add bot
+        </button>
+        <button
+          className={btnClass}
+          onClick={() => Logic.SnakeModel.addPlayerSnake()}
+        >
+          Add player
         </button>
       </div>
     </div>

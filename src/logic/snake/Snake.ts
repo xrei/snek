@@ -65,8 +65,8 @@ export class Snake {
     this.score = this.score + 1
   }
 
-  setDead(p: boolean) {
-    this.isDead = p
+  setDead() {
+    this.isDead = true
   }
 
   move(newHeadPosition: Coords) {
