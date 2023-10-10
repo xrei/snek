@@ -37,7 +37,9 @@ const $deadSnakes = $snakes.map((v) => v.filter((snake) => snake.isDead))
 export const $noPlayerSnakes = $snakes.map(
   (snakes) => snakes.filter((v) => !v.isAi).length < 1
 )
-export const $snakesPathData = createStore<SnakeNavDetsMap>({})
+export const $snakesPathData = createStore<Map<string, SnakeNavigationDetails>>(
+  new Map()
+)
 
 export const addPlayerSnake = createEvent()
 export const addBotSnake = createEvent()
@@ -93,12 +95,10 @@ sample({
 sample({
   clock: addSnakeNavDetails,
   source: $snakesPathData,
-  fn: (map, data) => {
-    const id = data.snakeId
-    const copy = {...map}
-
-    copy[id] = data
-    return copy
+  fn: (snakesDataMap, data) => {
+    const map = new Map(snakesDataMap)
+    map.set(data.snakeId, data)
+    return map
   },
   target: $snakesPathData,
 })
@@ -106,12 +106,12 @@ sample({
 sample({
   clock: $deadSnakes,
   source: $snakesPathData,
-  fn: (snakesData, snakes) => {
-    const data = {...snakesData}
+  fn: (snakesDataMap, snakes) => {
+    const map = new Map(snakesDataMap)
     for (const snake of snakes) {
-      delete data[snake.id]
+      map.delete(snake.id)
     }
-    return data
+    return map
   },
   target: $snakesPathData,
 })

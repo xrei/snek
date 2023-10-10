@@ -27,7 +27,6 @@ const main = () => {
     const {foods, snakes, graph, snakesPathData} = state
 
     clearCanvas(ctx)
-
     drawSnake({ctx, snakes, graph, snakePaths: snakesPathData})
 
     drawFood({ctx, food: foods, graph})

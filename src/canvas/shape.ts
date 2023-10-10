@@ -1,6 +1,6 @@
 import {CELL_SIZE, EDGE_GAP, getDigitsFromId} from '@app/shared'
 import {cellPosToPixelPos} from './utils'
-import {Snake, SnakeNavDetsMap} from '@app/logic/snake'
+import {Snake, SnakeNavigationDetails} from '@app/logic/snake'
 import {GridGraph} from '@app/shared/graph'
 import {GameModel} from '@app/logic/game'
 
@@ -17,7 +17,7 @@ type DrawFoodParams = Omit<GenericDrawParams, 'pos'> & {
 
 type DrawSnakeParams = Omit<GenericDrawParams, 'pos'> & {
   snakes: Snake[]
-  snakePaths: SnakeNavDetsMap
+  snakePaths: Map<string, SnakeNavigationDetails>
   graph: GridGraph
 }
 
@@ -88,9 +88,9 @@ export function drawSnake({ctx, snakes, snakePaths, graph}: DrawSnakeParams) {
   const isDebug = GameModel.$isDebug.getState()
 
   for (const snake of snakes) {
-    const snakePath = snakePaths[snake.id]?.path ?? []
+    const snakePath = snakePaths.get(snake.id)?.path ?? []
 
-    if (snake.isAi && isDebug) {
+    if (isDebug && snake.isAi && snakePath.length) {
       drawPath({
         ctx,
         color: snake.isDead ? ctx.canvas.style.background : snake.color.head,
