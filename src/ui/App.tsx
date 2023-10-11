@@ -2,6 +2,7 @@ import {useUnit} from 'effector-react'
 import styles from './app.module.css'
 import {Logic} from '@app/logic'
 import clsx from 'clsx'
+import {SnakeModel} from '@app/logic/snake'
 
 const {GameModel} = Logic
 
@@ -67,13 +68,19 @@ const Settings = () => {
 }
 
 const GameControls = () => {
-  const [isPlaying] = useUnit([GameModel.$gameIsPlaying])
-  const btnClass = clsx('w-full text-xs px-1 py-1 bg-white bg-opacity-50')
+  const [isPlaying, noPlayerSnake] = useUnit([
+    GameModel.$gameIsPlaying,
+    SnakeModel.$noPlayerSnakes,
+  ])
+  const btnClass = clsx(
+    'm-0 p-1 leading-5 text-xl bg-transparent border-transparent border hover:border-cyan-400 focus:outline-1 outline-cyan-400 disabled:border-transparent disabled:pointer-events-none'
+  )
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex gap-2">
+      <div className="flex gap-2 justify-between">
         <button
+          title={isPlaying ? 'Pause' : 'Play'}
           className={btnClass}
           onClick={() => {
             if (isPlaying) {
@@ -83,24 +90,30 @@ const GameControls = () => {
             }
           }}
         >
-          {isPlaying ? 'Pause' : 'Play'}
+          {isPlaying ? '⏸️' : '⏯️'}
         </button>
-        <button className={btnClass} onClick={() => GameModel.restart()}>
-          Reset
-        </button>
-      </div>
-      <div className="flex gap-2">
         <button
+          title="Restart"
+          className={btnClass}
+          onClick={() => GameModel.restart()}
+        >
+          🔄
+        </button>
+
+        <button
+          title="Add bot"
           className={btnClass}
           onClick={() => Logic.SnakeModel.addBotSnake()}
         >
-          Add bot
+          🤖
         </button>
         <button
+          title="Add player"
+          disabled={!noPlayerSnake}
           className={btnClass}
           onClick={() => Logic.SnakeModel.addPlayerSnake()}
         >
-          Add player
+          {noPlayerSnake ? '👤' : '🚷'}
         </button>
       </div>
     </div>
