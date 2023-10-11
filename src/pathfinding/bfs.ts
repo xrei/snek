@@ -1,5 +1,6 @@
 import {Vertex} from '@app/shared/graph'
 import {findPath} from './types'
+import {uniq} from 'ramda'
 
 export const bfs: findPath = (start, goal, graph) => {
   const frontier = [start]
@@ -38,7 +39,10 @@ export const bfs: findPath = (start, goal, graph) => {
     }
   }
 
-  const processed = Object.values(parent).map((v) => v.index)
+  const parentVals = Object.values(parent)
+  const processed = parentVals.length
+    ? uniq(parentVals.map((v) => v.index))
+    : []
 
   return {
     path,

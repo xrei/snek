@@ -88,9 +88,23 @@ export function drawSnake({ctx, snakes, snakePaths, graph}: DrawSnakeParams) {
   const isDebug = GameModel.$isDebug.getState()
 
   for (const snake of snakes) {
-    const snakePath = snakePaths.get(snake.id)?.path ?? []
+    const snakeNavDets = snakePaths.get(snake.id)
+    const snakePath = snakeNavDets?.path ?? []
+    const snakeProcessedCells = snakeNavDets?.processed ?? []
 
-    if (isDebug && snake.isAi && snakePath.length) {
+    if (
+      isDebug &&
+      snake.isAi &&
+      snakePath.length &&
+      snakeProcessedCells.length
+    ) {
+      for (const cell of snakeProcessedCells) {
+        drawSquare({
+          ctx,
+          pos: graph.indexToCoords(cell),
+          color: snake.color.processedColor,
+        })
+      }
       drawPath({
         ctx,
         color: snake.isDead ? ctx.canvas.style.background : snake.color.head,

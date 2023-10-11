@@ -56,7 +56,7 @@ const main = () => {
 
       if (!nextCoords) {
         snake.setDead()
-        Logic.GameModel.pause()
+        // Logic.GameModel.pause()
         continue
       }
 

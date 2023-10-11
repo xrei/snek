@@ -70,3 +70,24 @@ export function getDigitsFromId(id: string) {
   const match = /\d+/.exec(id)
   return match ? Number(match[0]) : 0
 }
+
+function hexToRgb(hex: string) {
+  return [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16))
+}
+
+export function adjustBrightness(hex: string, factor: number): string {
+  let [r, g, b] = hexToRgb(hex)
+  ;[r, g, b] = [r, g, b].map((channel) =>
+    Math.min(255, Math.max(0, Math.round(channel * factor)))
+  )
+
+  return `#${r.toString(16).padStart(2, '0')}${g
+    .toString(16)
+    .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+}
+
+export function hexToRGBA(hex: string, opacity = 1) {
+  const [r, g, b] = hexToRgb(hex)
+  const rgba = `rgba(${r}, ${g}, ${b}, ${opacity})`
+  return rgba
+}

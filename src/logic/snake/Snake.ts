@@ -1,5 +1,5 @@
 import {Strategies} from '@app/pathfinding/types'
-import {DIRECTIONS} from '@app/shared'
+import {DIRECTIONS, adjustBrightness, hexToRGBA} from '@app/shared'
 
 const snakeColors = [
   '#F6a040',
@@ -32,6 +32,7 @@ export class Snake {
   color: {
     head: string
     tail: string
+    processedColor: string
   }
   aiStrategy?: Strategies
 
@@ -95,21 +96,9 @@ export class Snake {
   }
 }
 
-function pickColor(): {head: string; tail: string} {
+function pickColor() {
   const tail = snakeColors[Math.floor(Math.random() * snakeColors.length)]
   const head = adjustBrightness(tail, 0.7)
-  return {head, tail}
-}
-
-function adjustBrightness(hex: string, factor: number): string {
-  let [r, g, b] = [1, 3, 5].map((offset) =>
-    parseInt(hex.slice(offset, offset + 2), 16)
-  )
-  ;[r, g, b] = [r, g, b].map((channel) =>
-    Math.min(255, Math.max(0, Math.round(channel * factor)))
-  )
-
-  return `#${r.toString(16).padStart(2, '0')}${g
-    .toString(16)
-    .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+  const processedColor = hexToRGBA(tail, 0.15)
+  return {head, tail, processedColor}
 }
