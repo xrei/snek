@@ -1,10 +1,9 @@
-import {Vertex} from '@app/shared/graph'
 import {findPath} from './types'
-import {uniq} from 'ramda'
+import {keys} from 'ramda'
 
 export const bfs: findPath = (start, goal, graph) => {
   const frontier = [start]
-  const parent: Record<number, Vertex> = {}
+  const parent: Record<number, number> = {}
   let found = false
 
   while (frontier.length !== 0) {
@@ -17,6 +16,7 @@ export const bfs: findPath = (start, goal, graph) => {
 
     for (const n of current.neighbors) {
       const vertex = graph.getVertex(n)
+
       const emptyOrFood =
         vertex &&
         (vertex.value.type === graph.CELL_TYPE.empty ||
@@ -24,25 +24,22 @@ export const bfs: findPath = (start, goal, graph) => {
 
       if (!parent[n] && emptyOrFood) {
         frontier.push(vertex)
-        parent[n] = current
+        parent[n] = current.index
       }
     }
   }
   const path: number[] = []
 
   if (found) {
-    let current = goal
+    let current = goal.index
 
-    while (current.index !== start.index) {
-      path.unshift(current.index)
-      current = parent[current.index]
+    while (current !== start.index) {
+      path.unshift(current)
+      current = parent[current]
     }
   }
 
-  const parentVals = Object.values(parent)
-  const processed = parentVals.length
-    ? uniq(parentVals.map((v) => v.index))
-    : []
+  const processed = keys(parent)
 
   return {
     path,
