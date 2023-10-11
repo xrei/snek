@@ -48,7 +48,10 @@ export const createLoopFactory = <T>({
   })
 
   const doUpdate = sample({clock: loopFx, source: $state})
-  const renderPause = sample({clock: start, filter: GameModel.$gameIsPaused})
+  const renderPause = sample({
+    clock: [start, $state],
+    filter: GameModel.$gameIsPaused,
+  })
   const doRender = sample({clock: [loopFx.done, renderPause], source: $state})
 
   doUpdate.watch((state) => {

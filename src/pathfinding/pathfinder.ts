@@ -15,7 +15,9 @@ type determinePathParams = {
   start: Vertex
   goal?: Vertex | null
   graph: GridGraph
+  returnProcessed?: boolean
 }
+
 export const StrategiesMap: Record<Strategies, findPath> = {
   [Strategies.bfs]: bfs,
   [Strategies.dfs]: bfs,
@@ -25,10 +27,15 @@ export const StrategiesMap: Record<Strategies, findPath> = {
 
 export const determinePath =
   (strategy: findPath) =>
-  ({goal, start, graph}: determinePathParams): NavigationResult | null => {
+  ({
+    goal,
+    start,
+    graph,
+    returnProcessed,
+  }: determinePathParams): NavigationResult | null => {
     if (!goal) return null
 
-    const {path, processed} = strategy(start, goal, graph)
+    const {path, processed} = strategy(start, goal, graph, returnProcessed)
 
     if (!path.length) return null
 
@@ -93,6 +100,7 @@ export const findReachableClosestObject = ({
       start: startVertex,
       goal: goalVertex,
       graph,
+      returnProcessed: false,
     })
 
     if (result && result.path.length > 0) {

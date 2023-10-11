@@ -7,7 +7,8 @@ import {GameModel} from './game'
 export const $state = combine({
   foods: FoodModel.$food,
   graph: GraphModel.$graph,
-  snakes: SnakeModel.$snakes,
+  // snakes has priority with more score
+  snakes: SnakeModel.$snakesByScore,
   snakesPathData: SnakeModel.$snakesPathData,
 })
 

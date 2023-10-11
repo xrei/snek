@@ -21,7 +21,7 @@ sample({
   target: $food,
 })
 
-function createManyFoods(n = 10) {
+function createManyFoods(n = 16) {
   const xs: Food[] = []
 
   for (let i = 0; i < n; i++) {
@@ -30,6 +30,10 @@ function createManyFoods(n = 10) {
     xs[i] = food
   }
   return xs
+}
+
+export function clearFoodById(foods: Food[], id: string) {
+  return foods.filter((x) => x[1] !== id)
 }
 
 export function createFood(graph?: GridGraph): Food | null {
@@ -44,10 +48,6 @@ export function createFood(graph?: GridGraph): Food | null {
   graph.setValueByIndex(idx, {type: graph.CELL_TYPE.food, id: foodId})
 
   return [coords, foodId]
-}
-
-export function clearFoodById(foods: Food[], id: string) {
-  return foods.filter((x) => x[1] !== id)
 }
 
 export function createFoodIfExist(foods: Food[], graph: GridGraph) {

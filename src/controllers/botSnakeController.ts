@@ -74,6 +74,7 @@ export function snakeBotController({
       goal: reachableFood,
       graph,
       start: startVertex,
+      returnProcessed: true,
     })
 
     if (res && res.path.length) {

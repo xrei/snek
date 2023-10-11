@@ -3,7 +3,8 @@ import {Vertex, GridGraph} from '@app/shared/graph'
 export type findPath = (
   start: Vertex,
   goal: Vertex,
-  graph: GridGraph
+  graph: GridGraph,
+  returnProcessed?: boolean
 ) => {path: number[]; processed: number[]}
 
 export enum Strategies {
